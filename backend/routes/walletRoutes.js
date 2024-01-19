@@ -53,7 +53,8 @@ router.post(
   "/withdraw",
   protect,
   asyncHandler(async (req, res) => {
-    const { amount } = req.body;
+    
+    const { amount } = req.body; // Amount to be reduced from user's account
 
     const TDSAmount = amount * 0.1;
 
@@ -64,8 +65,9 @@ router.post(
     const user = await User.findById(userId);
 
     if (user) {
-      if (user.earning >= 450) {
-        if (lastAmount <= user.earning) {
+      if (user.earning >= 500) {
+        if (amount <= user.earning) {
+
           user.transactions.push({
             referenceID: generateRandomString(5),
             amount: amount,
@@ -77,17 +79,21 @@ router.post(
           const transactionUpdate = await user.save();
 
           if (transactionUpdate) {
+
             res.status(200).json({
               sts: "01",
               msg: "Withdrawal request sent. The amount will be credited to your account within 48 hours!",
               transactions: user.transactions,
             });
+
           } else {
+
             res.status(401).json({
               sts: "00",
               msg: "Transaction failed. Please try again!",
             });
           }
+
         } else {
           res.status(401).json({
             sts: "00",
@@ -143,6 +149,7 @@ router.post(
   "/verify-transaction",
   protect,
   asyncHandler(async (req, res) => {
+    
     const { userId, transId } = req.body;
 
     const user = await User.findById(userId);
@@ -151,7 +158,7 @@ router.post(
       const transaction = user.transactions.map((trans) => {
         if (trans._id == transId) {
           trans.status = "Approved";
-          user.earning = user.earning - trans.lastAmount;
+          user.earning = user.earning - trans.amount;
         }
       });
       

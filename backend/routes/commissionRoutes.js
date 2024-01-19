@@ -36,6 +36,7 @@ const splitCommissions = async (user, amount, levels, percentages) => {
 
 // POST: Split commission after the user verified successfully.
 // Only for Super admin.
+// Not used in the app
 router.post(
   "/split-commission",
   protect,
